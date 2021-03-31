@@ -36,14 +36,7 @@ def consuming(a):
 
 
 def query(a):
-    new_url = "https://bdapi.gameyw.netease.com:443/ky59/v1/g37_charts/oneuid"
-    new_params = {
-        "server": "all",
-        "roleid": url_list[a],
-        "_": nowtime,
-    }
-    new_html = requests.get(url=new_url, params=new_params).json()
-    record = new_html["result"]["extra"]["bl"]
+    record = url_list[a]["bl"]
     for u in record:
         print("\t对手名称：" + u["d_role_name"])
         print("\t对局时间：" + t(u["battle_time"]))
@@ -56,6 +49,30 @@ def query(a):
     input("按回车键返回上一页")
 
 
+def record_yys(a):
+    record = url_list[a]["bl"]
+    global qm
+    global qm_win
+    global sl
+    global sl_win
+    global bqn
+    global bqn_win
+    for u in record:
+        if u["total_battle_time"] != 0:
+            if u["battle_list"][0]["shishen_id"] == 10:
+                qm += 1
+                if u["battle_result"] == 1:
+                    qm_win += 1
+            if u["battle_list"][0]["shishen_id"] == 11:
+                sl += 1
+                if u["battle_result"] == 1:
+                    sl_win += 1
+            if u["battle_list"][0]["shishen_id"] == 12:
+                bqn += 1
+                if u["battle_result"] == 1:
+                    bqn_win += 1
+
+
 def information(a):
     new_url = "https://bdapi.gameyw.netease.com:443/ky59/v1/g37_charts/oneuid"
     new_params = {
@@ -64,14 +81,20 @@ def information(a):
         "_": nowtime,
     }
     new_html = requests.get(url=new_url, params=new_params).json()["result"]["extra"]
-    return str(int(new_html["count_win"] / new_html["count_all"] * 100)) + "%"
+    return new_html
 
 
 url_list = []
 top_100 = []
-
-# for y in range(1, 11):
-for y in range(1, 2):
+game = 0
+qm = 0
+qm_win = 0
+sl = 0
+sl_win = 0
+bqn = 0
+bqn_win = 0
+for y in range(1, 11):
+    # for y in range(1, 2):
     url = "https://bdapi.gameyw.netease.com:443/ky59/v1/g37_charts/topuids"
     params = {
         "server": "all",
@@ -81,13 +104,18 @@ for y in range(1, 2):
     html = requests.get(url=url, params=params).json()
     top = html["result"]
     for i in range(len(top)):
-        url_list.append(top[i]["role_id"])
-        top_100.append("排名第" + str((y - 1) * 10 + i + 1) + " " + top[i]["small_extra"]["role_name"] + " 胜率" + information(top[i]["role_id"]))
+        url_list.append(information(top[i]["role_id"]))
+        win = str(int(url_list[i]["count_win"] / url_list[i]["count_all"] * 100)) + "%"
+        top_100.append("排名第" + str((y - 1) * 10 + i + 1) + " " + top[i]["small_extra"]["role_name"] + " 胜率" + win)
+        game += url_list[i]["count_all"]
+        record_yys(i)
 while True:
     print("斗技排行top100")
     for i in top_100:
         print(i)
     print("----------------------------------------")
+    print("总记录对局" + str(game))
+    print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "% 神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "% 比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
     num = int(input("输入排名查询对局数据,0为退出\n"))
     if num == 0:
         break
