@@ -1,5 +1,6 @@
 import requests
 import time
+import os
 
 
 def nowtime():
@@ -109,6 +110,9 @@ for y in range(1, 11):
         top_100.append("排名第" + str((y - 1) * 10 + i + 1) + " " + top[i]["small_extra"]["role_name"] + " 胜率" + win)
         game += url_list[i]["count_all"]
         record_yys(i)
+        os.system("cls")
+        print("正在爬取数据，当前进度" + str((y - 1) * 10 + i + 1) + "%", flush=True)
+os.system("cls")
 while True:
     print("斗技排行top100")
     for i in top_100:
@@ -116,6 +120,7 @@ while True:
     print("----------------------------------------")
     print("总记录对局" + str(game))
     print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "% 神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "% 比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
+    print("上阵局数只统计排行榜列表的，敌方不做记录")
     num = int(input("输入排名查询对局数据,0为退出\n"))
     if num == 0:
         break
