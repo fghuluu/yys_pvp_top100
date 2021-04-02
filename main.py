@@ -39,6 +39,7 @@ def consuming(a):
 def query(a):
     record = url_list[a]["bl"]
     for u in record:
+        print("\t名称：" + u["role_name"])
         print("\t对手名称：" + u["d_role_name"])
         print("\t对局时间：" + t(u["battle_time"]))
         if u["total_battle_time"] != 0:
@@ -85,6 +86,13 @@ def information(a):
     return new_html
 
 
+def score(a):
+    if a < 3000:
+        return str(a)
+    else:
+        return str(int((a - 3000) / 30))+"星"
+
+
 url_list = []
 top_100 = []
 game = 0
@@ -106,12 +114,12 @@ for y in range(1, 11):
     top = html["result"]
     for i in range(len(top)):
         url_list.append(information(top[i]["role_id"]))
-        win = str(int(url_list[i]["count_win"] / url_list[i]["count_all"] * 100)) + "%"
-        top_100.append("排名第" + str((y - 1) * 10 + i + 1) + " " + top[i]["small_extra"]["role_name"] + " 胜率" + win)
-        game += url_list[i]["count_all"]
+        win = str(int(top[i]['small_extra']["count_win"] / top[i]['small_extra']["count_all"] * 100)) + "%"
+        top_100.append("排名第" + str(top[i]["rank"]) + " " + top[i]["small_extra"]["role_name"] + " 当前" + score(top[i]["score"]) + " 胜率" + win + " 数据来源时间：" + top[i]["insert_time"])
+        game += top[i]["small_extra"]["count_all"]
         record_yys(i)
         os.system("cls")
-        print("正在爬取数据，当前进度" + str((y - 1) * 10 + i + 1) + "%", flush=True)
+        print("正在爬取数据，当前进度" + str((y - 1) * 10 + i + 1) + "%")
 os.system("cls")
 while True:
     print("斗技排行top100")
@@ -120,7 +128,7 @@ while True:
     print("----------------------------------------")
     print("总记录对局" + str(game))
     print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "% 神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "% 比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
-    print("上阵局数只统计排行榜列表的，敌方不做记录")
+    print("上阵局数敌方不做记录")
     num = int(input("输入排名查询对局数据,0为退出\n"))
     if num == 0:
         break
