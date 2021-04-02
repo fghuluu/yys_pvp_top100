@@ -36,6 +36,10 @@ def consuming(a):
     return str(minute) + "分" + str(s) + "秒"
 
 
+def id_conversion(a):
+    return ssid[str(a)]["name"]
+
+
 def query(a):
     record = url_list[a]["bl"]
     for u in record:
@@ -45,6 +49,10 @@ def query(a):
         if u["total_battle_time"] != 0:
             print("\t上阵阴阳师：" + change(u["battle_list"][0]["shishen_id"]))
             print("\t对手阴阳师：" + change(u["d_battle_list"][0]["shishen_id"]))
+            for o in range(2, 7):
+                print("\t上阵式神" + str(o-1) + "：" + id_conversion(u["battle_list"][o]["shishen_id"]))
+            for o in range(2, 7):
+                print("\t对手上阵式神" + str(o-1) + "：" + id_conversion(u["d_battle_list"][o]["shishen_id"]))
         print("\t对局用时：" + consuming(u["total_battle_time"]))
         print("\t对局结果：" + result(u["battle_result"]))
         print("----------------------------------------")
@@ -90,7 +98,21 @@ def score(a):
     if a < 3000:
         return str(a)
     else:
-        return str(int((a - 3000) / 30))+"星"
+        return str(int((a - 3000) / 30)) + "星"
+
+
+def test():
+    print(url_list[0])
+    input()
+
+
+def ssid():
+    new_url = "https://s.166.net:443/config/bbs_yys/shishen.json"
+    new_params = {
+        "t": nowtime
+    }
+    new_html = requests.get(url=new_url, params=new_params).json()
+    return new_html
 
 
 url_list = []
@@ -102,8 +124,8 @@ sl = 0
 sl_win = 0
 bqn = 0
 bqn_win = 0
-for y in range(1, 11):
-    # for y in range(1, 2):
+# for y in range(1, 11):
+for y in range(1, 2):
     url = "https://bdapi.gameyw.netease.com:443/ky59/v1/g37_charts/topuids"
     params = {
         "server": "all",
@@ -121,6 +143,7 @@ for y in range(1, 11):
         os.system("cls")
         print("正在爬取数据，当前进度" + str((y - 1) * 10 + i + 1) + "%")
 os.system("cls")
+ssid = ssid()
 while True:
     print("斗技排行top100")
     for i in top_100:
