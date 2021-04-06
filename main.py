@@ -47,12 +47,12 @@ def query(a):
         print("\t对手名称：" + u["d_role_name"])
         print("\t对局时间：" + t(u["battle_time"]))
         if u["total_battle_time"] != 0:
-            print("\t上阵阴阳师：" + change(u["battle_list"][0]["shishen_id"]))
-            print("\t对手阴阳师：" + change(u["d_battle_list"][0]["shishen_id"]))
+            print("\t上阵阴阳师：" + change(u["battle_list"][0]["shishen_id"]) + " 等级：" + str(u["battle_list"][0]["level"]))
             for o in range(2, 7):
-                print("\t上阵式神" + str(o-1) + "：" + id_conversion(u["battle_list"][o]["shishen_id"]))
+                print("\t上阵式神" + str(o-1) + "：" + id_conversion(u["battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
+            print("\t对手阴阳师：" + change(u["d_battle_list"][0]["shishen_id"]) + " 等级：" + str(u["battle_list"][0]["level"]))
             for o in range(2, 7):
-                print("\t对手上阵式神" + str(o-1) + "：" + id_conversion(u["d_battle_list"][o]["shishen_id"]))
+                print("\t对手上阵式神" + str(o-1) + "：" + id_conversion(u["d_battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
         print("\t对局用时：" + consuming(u["total_battle_time"]))
         print("\t对局结果：" + result(u["battle_result"]))
         print("----------------------------------------")
@@ -73,14 +73,22 @@ def record_yys(a):
                 qm += 1
                 if u["battle_result"] == 1:
                     qm_win += 1
-            if u["battle_list"][0]["shishen_id"] == 11:
+            elif u["battle_list"][0]["shishen_id"] == 11:
                 sl += 1
                 if u["battle_result"] == 1:
                     sl_win += 1
-            if u["battle_list"][0]["shishen_id"] == 12:
+            elif u["battle_list"][0]["shishen_id"] == 12:
                 bqn += 1
                 if u["battle_result"] == 1:
                     bqn_win += 1
+            for o in range(2, 7):
+                frequency = 0
+                for p in range(len(battle)):
+                    if u["battle_list"][o]["shishen_id"] == battle[p][0]:
+                        battle[p].append([u["battle_list"][o]["shishen_id"]])
+                        frequency += 1
+                if frequency == 0:
+                    battle.append([u["battle_list"][o]["shishen_id"]])
 
 
 def information(a):
@@ -107,14 +115,12 @@ def test():
 
 
 def ssid():
-    new_url = "https://s.166.net:443/config/bbs_yys/shishen.json"
-    new_params = {
-        "t": nowtime
-    }
-    new_html = requests.get(url=new_url, params=new_params).json()
+    new_url = "https://s.166.net:443/config/bbs_yys/shishen.json?t=" + str(nowtime)
+    new_html = requests.get(url=new_url).json()
     return new_html
 
 
+battle = []
 url_list = []
 top_100 = []
 game = 0
@@ -151,6 +157,8 @@ while True:
     print("----------------------------------------")
     print("总记录对局" + str(game))
     print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "% 神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "% 比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
+    for i in battle:
+        print(id_conversion(i[0]) + "上阵局数为" + str(len(i)))
     print("上阵局数敌方不做记录")
     num = int(input("输入排名查询对局数据,0为退出\n"))
     if num == 0:
