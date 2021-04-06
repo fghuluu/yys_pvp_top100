@@ -85,10 +85,23 @@ def record_yys(a):
                 frequency = 0
                 for p in range(len(battle)):
                     if u["battle_list"][o]["shishen_id"] == battle[p][0]:
+                        temporary_win = battle[p][-2]
+                        temporary_sum = battle[p][-1]
+                        battle[p] = battle[p][:-2]
                         battle[p].append([u["battle_list"][o]["shishen_id"]])
+                        if u["battle_result"] == 0:
+                            battle[p].append(temporary_win)
+                        else:
+                            battle[p].append(temporary_win + 1)
+                        battle[p].append(temporary_sum + 1)
                         frequency += 1
                 if frequency == 0:
                     battle.append([u["battle_list"][o]["shishen_id"]])
+                    if u["battle_result"] == 0:
+                        battle[-1].append(0)
+                    else:
+                        battle[-1].append(1)
+                    battle[-1].append(1)
 
 
 def information(a):
@@ -130,8 +143,8 @@ sl = 0
 sl_win = 0
 bqn = 0
 bqn_win = 0
-# for y in range(1, 11):
-for y in range(1, 2):
+for y in range(1, 11):
+    # for y in range(1, 2):
     url = "https://bdapi.gameyw.netease.com:443/ky59/v1/g37_charts/topuids"
     params = {
         "server": "all",
@@ -156,9 +169,11 @@ while True:
         print(i)
     print("----------------------------------------")
     print("总记录对局" + str(game))
-    print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "% 神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "% 比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
+    print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "%")
+    print("神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "%")
+    print("比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
     for i in battle:
-        print(id_conversion(i[0]) + "上阵局数为" + str(len(i)))
+        print(id_conversion(i[0]) + "上阵局数为" + str(len(i) - 2) + " 胜率为" + str(int(i[-2]/i[-1] * 100)) + "%")
     print("上阵局数敌方不做记录")
     num = int(input("输入排名查询对局数据,0为退出\n"))
     if num == 0:
