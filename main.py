@@ -49,10 +49,10 @@ def query(a):
         if u["total_battle_time"] != 0:
             print("\t上阵阴阳师：" + change(u["battle_list"][0]["shishen_id"]) + " 等级：" + str(u["battle_list"][0]["level"]))
             for o in range(2, 7):
-                print("\t上阵式神" + str(o-1) + "：" + id_conversion(u["battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
+                print("\t上阵式神" + str(o - 1) + "：" + id_conversion(u["battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
             print("\t对手阴阳师：" + change(u["d_battle_list"][0]["shishen_id"]) + " 等级：" + str(u["battle_list"][0]["level"]))
             for o in range(2, 7):
-                print("\t对手上阵式神" + str(o-1) + "：" + id_conversion(u["d_battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
+                print("\t对手上阵式神" + str(o - 1) + "：" + id_conversion(u["d_battle_list"][o]["shishen_id"]) + " 等级：" + str(u["battle_list"][o]["level"]))
         print("\t对局用时：" + consuming(u["total_battle_time"]))
         print("\t对局结果：" + result(u["battle_result"]))
         print("----------------------------------------")
@@ -84,16 +84,17 @@ def record_yys(a):
             for o in range(2, 7):
                 frequency = 0
                 for p in range(len(battle)):
-                    if u["battle_list"][o]["shishen_id"] == battle[p][0]:
-                        temporary_win = battle[p][-2]
-                        temporary_sum = battle[p][-1]
-                        battle[p] = battle[p][:-2]
+                    if u["battle_list"][o]["shishen_id"] in battle[p]:
+                        temporary_win = battle[p][-3]
+                        temporary_sum = battle[p][-2]
+                        battle[p] = battle[p][:-3]
                         battle[p].append([u["battle_list"][o]["shishen_id"]])
                         if u["battle_result"] == 0:
                             battle[p].append(temporary_win)
                         else:
                             battle[p].append(temporary_win + 1)
                         battle[p].append(temporary_sum + 1)
+                        battle[p].append(int(battle[p][-2] / battle[p][-1] * 100))
                         frequency += 1
                 if frequency == 0:
                     battle.append([u["battle_list"][o]["shishen_id"]])
@@ -102,6 +103,7 @@ def record_yys(a):
                     else:
                         battle[-1].append(1)
                     battle[-1].append(1)
+                    battle[-1].append(battle[-1][-2] / battle[-1][-1])
 
 
 def information(a):
@@ -133,6 +135,23 @@ def ssid():
     return new_html
 
 
+def pvp_sort(a):
+    return a[-1]
+
+
+def record_list():
+    print("总记录对局" + str(game))
+    print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "%")
+    print("神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "%")
+    print("比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
+    battle.sort(key=pvp_sort, reverse=True)
+    for u in battle:
+        print(id_conversion(u[0]) + "上阵局数为" + str(len(u) - 3) + " 胜率为" + str(u[-1]) + "%")
+    print("上阵局数敌方不做记录")
+    print("----------------------------------------")
+    input("按回车键返回上一页")
+
+
 battle = []
 url_list = []
 top_100 = []
@@ -160,7 +179,7 @@ for y in range(1, 11):
         game += top[i]["small_extra"]["count_all"]
         record_yys(i)
         os.system("cls")
-        print("正在爬取数据，当前进度" + str((y - 1) * 10 + i + 1) + "%")
+        print("正在爬取数据,爬取速度与网速有关,当前进度" + str((y - 1) * 10 + i + 1) + "%")
 os.system("cls")
 ssid = ssid()
 while True:
@@ -168,15 +187,14 @@ while True:
     for i in top_100:
         print(i)
     print("----------------------------------------")
-    print("总记录对局" + str(game))
-    print("晴明上阵局数为" + str(qm) + "胜率为" + str(int(qm_win / qm * 100)) + "%")
-    print("神乐上阵局数为" + str(sl) + "胜率为" + str(int(sl_win / sl * 100)) + "%")
-    print("比丘尼上阵局数为" + str(bqn) + "胜率为" + str(int(bqn_win / bqn * 100)) + "%")
-    for i in battle:
-        print(id_conversion(i[0]) + "上阵局数为" + str(len(i) - 2) + " 胜率为" + str(int(i[-2]/i[-1] * 100)) + "%")
-    print("上阵局数敌方不做记录")
-    num = int(input("输入排名查询对局数据,0为退出\n"))
-    if num == 0:
-        break
-    elif 1 <= num <= 100:
-        query(num - 1)
+    num = input("输入排名查询对局数据,0为胜率列表\n")
+    if num.isdigit():
+        num = int(num)
+        if num == 0:
+            record_list()
+        elif 1 <= num <= 100:
+            query(int(num) - 1)
+        else:
+            input("输入不正确，请按回车键后重新输入")
+    else:
+        input("输入不正确，请按回车键后重新输入")
